@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Thio — Tech Hobbyist</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600;700&family=Anybody:wght@800&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+  --bg:#0b0f14;
+  --term-bg:#11161d;
+  --bar-bg:#161b22;
+  --border:#2d333b;
+
+  --green:#3fb950;
+  --cyan:#56d4dd;
+  --blue:#79c0ff;
+  --red:#ff7b72;
+
+  --text:#d6e2f0;
+  --muted:#7d8590;
+  --dim:#21262d;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+
+  font-family:'Victor Mono', monospace;
+
+  min-height:100vh;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  overflow:hidden;
+
+  padding:24px;
+}
+
+body::before{
+  content:"";
+
+  position:fixed;
+  inset:0;
+
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,.08) 2px,
+      rgba(0,0,0,.08) 4px
+    );
+
+  pointer-events:none;
+}
+
+.outer-wrap{
+  width:100%;
+  max-width:980px;
+}
+
+.terminal{
+  background:var(--term-bg);
+
+  border:1px solid var(--border);
+  border-radius:14px;
+
+  overflow:hidden;
+
+  box-shadow:
+    0 0 40px rgba(0,0,0,.35),
+    0 0 120px rgba(86,212,221,.03);
+}
+
+.titlebar{
+  height:48px;
+
+  background:var(--bar-bg);
+
+  border-bottom:1px solid var(--border);
+
+  display:flex;
+  align-items:center;
+
+  padding:0 16px;
+}
+
+.traffic{
+  display:flex;
+  gap:8px;
+}
+
+.dot{
+  width:12px;
+  height:12px;
+  border-radius:50%;
+}
+
+.red{background:#ff5f56;}
+.yellow{background:#ffbd2e;}
+.green{background:#27c93f;}
+
+.tabs{
+  margin-left:18px;
+
+  display:flex;
+  align-items:flex-end;
+
+  height:100%;
+}
+
+.tab{
+  height:36px;
+
+  display:flex;
+  align-items:center;
+
+  padding:0 16px;
+
+  border-radius:6px 6px 0 0;
+
+  color:var(--muted);
+
+  font-size:.72rem;
+}
+
+.tab.active{
+  background:var(--term-bg);
+
+  border:1px solid var(--border);
+  border-bottom:none;
+
+  color:var(--text);
+}
+
+.title-right{
+  margin-left:auto;
+
+  color:var(--muted);
+
+  font-size:.72rem;
+
+  letter-spacing:.08em;
+
+  text-transform:lowercase;
+}
+
+.term-body{
+  height:80vh;
+
+  overflow-y:auto;
+
+  padding:28px;
+}
+
+.boot-line{
+  font-size:.72rem;
+
+  color:var(--muted);
+
+  margin-bottom:6px;
+}
+
+.sep{
+  border:none;
+
+  border-top:1px solid var(--dim);
+
+  margin:18px 0 24px;
+}
+
+.cmd-line{
+  display:flex;
+  flex-wrap:wrap;
+
+  margin-bottom:10px;
+}
+
+.prompt-user{
+  color:var(--green);
+  font-weight:700;
+}
+
+.prompt-at{
+  color:var(--muted);
+}
+
+.prompt-host{
+  color:var(--cyan);
+  font-weight:700;
+}
+
+.prompt-path{
+  color:var(--blue);
+}
+
+.prompt-sym{
+  color:var(--muted);
+  margin:0 8px 0 4px;
+}
+
+.output{
+  margin-bottom:24px;
+
+  line-height:1.8;
+}
+
+.whoami-card{
+  border:1px solid var(--dim);
+
+  border-radius:10px;
+
+  overflow:hidden;
+
+  max-width:620px;
+}
+
+.whoami-top{
+  background:var(--dim);
+
+  padding:16px;
+
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+.avatar{
+  width:48px;
+  height:48px;
+
+  border-radius:10px;
+
+  background:linear-gradient(135deg,#1f6feb,#58a6ff);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:white;
+
+  font-family:'Anybody', sans-serif;
+  font-size:1rem;
+}
+
+.name{
+  font-family:'Anybody', sans-serif;
+
+  font-size:1.3rem;
+
+  color:white;
+}
+
+.role{
+  font-size:.74rem;
+
+  color:var(--muted);
+}
+
+.whoami-body{
+  padding:16px;
+}
+
+.row{
+  display:flex;
+
+  gap:16px;
+
+  margin-bottom:10px;
+
+  font-size:.8rem;
+}
+
+.key{
+  width:90px;
+
+  color:var(--muted);
+}
+
+.green-text{
+  color:var(--green);
+}
+
+.cyan-text{
+  color:var(--cyan);
+}
+
+.table{
+  width:100%;
+
+  border-collapse:collapse;
+
+  font-size:.8rem;
+}
+
+.table th{
+  text-align:left;
+
+  color:var(--muted);
+
+  padding-bottom:10px;
+
+  border-bottom:1px solid var(--dim);
+}
+
+.table td{
+  padding:12px 0;
+
+  border-bottom:1px solid rgba(255,255,255,.04);
+}
+
+.table tr{
+  transition:.15s;
+
+  cursor:pointer;
+}
+
+.table tr:hover{
+  background:rgba(255,255,255,.02);
+}
+
+.role-cell{
+  color:var(--green);
+
+  font-weight:700;
+}
+
+.company{
+  color:var(--blue);
+}
+
+.period{
+  color:var(--muted);
+}
+
+.detail-panel{
+  margin-top:16px;
+
+  border-left:3px solid var(--cyan);
+
+  padding:14px 16px;
+
+  background:rgba(255,255,255,.02);
+
+  border-radius:0 8px 8px 0;
+
+  display:none;
+}
+
+.detail-panel.show{
+  display:block;
+}
+
+.skills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.skill{
+  padding:8px 14px;
+
+  border:1px solid var(--dim);
+
+  border-radius:6px;
+
+  background:rgba(255,255,255,.02);
+
+  font-size:.74rem;
+
+  transition:.15s;
+}
+
+.skill:hover{
+  border-color:var(--cyan);
+
+  color:var(--cyan);
+}
+
+.input-line{
+  display:flex;
+  align-items:center;
+
+  margin-top:24px;
+}
+
+#terminalInput{
+  flex:1;
+
+  background:transparent;
+  border:none;
+  outline:none;
+
+  color:var(--text);
+
+  font-family:'Victor Mono', monospace;
+  font-size:.86rem;
+
+  caret-color:var(--green);
+}
+
+.toast{
+  position:fixed;
+
+  right:20px;
+  bottom:20px;
+
+  background:var(--bar-bg);
+
+  border:1px solid var(--green);
+
+  color:var(--green);
+
+  padding:10px 16px;
+
+  border-radius:6px;
+
+  opacity:0;
+
+  transform:translateY(10px);
+
+  transition:.25s;
+}
+
+.toast.show{
+  opacity:1;
+
+  transform:translateY(0);
+}
+
+.fade-up{
+  animation:fadeUp .25s ease;
+}
+
+@keyframes fadeUp{
+  from{
+    opacity:0;
+    transform:translateY(-6px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+@media(max-width:700px){
+
+  .term-body{
+    padding:18px;
+  }
+
+  .table th:first-child,
+  .table td:first-child{
+    display:none;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="outer-wrap">
+
+<div class="terminal">
+
+<div class="titlebar">
+
+<div class="traffic">
+<div class="dot red"></div>
+<div class="dot yellow"></div>
+<div class="dot green"></div>
+</div>
+
+<div class="tabs">
+<div class="tab active">portfolio.sh</div>
+</div>
+
+<div class="title-right">
+thio.dev
+</div>
+
+</div>
+
+<div class="term-body" id="termBody">
+
+<div class="boot-line">
+Last login: Fri May 8 14:32:11 2026
+</div>
+
+<div class="boot-line">
+thio runtime environment ·
+<span style="color:var(--green)">active</span>
+</div>
+
+<div class="boot-line">
+system initialized successfully
+</div>
+
+<hr class="sep">
+
+<div id="lines"></div>
+
+<div class="input-line">
+
+<span class="prompt-user">thio</span>
+<span class="prompt-at">@</span>
+<span class="prompt-host">portfolio</span>
+<span class="prompt-at">:</span>
+<span class="prompt-path">~</span>
+<span class="prompt-sym">$</span>
+
+<input
+type="text"
+id="terminalInput"
+autocomplete="off"
+spellcheck="false"
+autofocus
+>
+
+</div>
+
+</div>
+</div>
+</div>
+
+<div class="toast" id="toast">
+✓ email copied to clipboard
+</div>
+
+<script>
+
+const linesEl = document.getElementById('lines');
+const input = document.getElementById('terminalInput');
+const body = document.getElementById('termBody');
+
+const jobs = [
+{
+role:'Independent Builder',
+company:'Personal Projects',
+period:'2025–Present',
+desc:'Experimenting with local AI systems, chatbot workflows, automation tools, and self-hosted environments.'
+},
+{
+role:'Automation Hobbyist',
+company:'Independent',
+period:'2023–Present',
+desc:'Building small workflow tools, Python utilities, and productivity-focused automation systems.'
+},
+{
+role:'Media Processing Enthusiast',
+company:'Personal Workflows',
+period:'2021–Present',
+desc:'Optimizing video encoding, transcoding, and media processing pipelines using professional tools.'
+},
+{
+role:'Tea Time Project',
+company:'Future Business',
+period:'2026',
+desc:'Planning systems, branding, and digital workflows for a modern tea shop concept.'
+}
+];
+
+const historyStack = [];
+let historyIndex = -1;
+
+function scrollBottom(){
+body.scrollTop = body.scrollHeight;
+}
+
+function append(html){
+
+const div = document.createElement('div');
+
+div.className = 'fade-up';
+
+div.innerHTML = html;
+
+linesEl.appendChild(div);
+
+scrollBottom();
+}
+
+function promptLine(cmd){
+
+return `
+<div class="cmd-line">
+
+<span class="prompt-user">thio</span>
+<span class="prompt-at">@</span>
+<span class="prompt-host">portfolio</span>
+<span class="prompt-at">:</span>
+<span class="prompt-path">~</span>
+<span class="prompt-sym">$</span>
+
+${cmd}
+
+</div>
+`;
+}
+
+function copyMail(){
+
+navigator.clipboard.writeText(
+'thio@outlook.com'
+);
+
+const toast = document.getElementById('toast');
+
+toast.classList.add('show');
+
+setTimeout(()=>{
+toast.classList.remove('show');
+},2500);
+
+}
+
+window.copyMail = copyMail;
+
+function showDetail(index){
+
+const panel = document.getElementById('detailPanel');
+
+if(!panel) return;
+
+panel.innerHTML = jobs[index].desc;
+
+panel.classList.add('show');
+
+scrollBottom();
+
+}
+
+window.showDetail = showDetail;
+
+const commands = {
+
+help(){
+
+return `
+<div class="output">
+
+available commands:<br>
+
+├── whoami<br>
+├── experience<br>
+├── skills<br>
+├── projects<br>
+├── github<br>
+├── contact<br>
+├── clear<br>
+└── help
+
+</div>
+`;
+
+},
+
+whoami(){
+
+return `
+<div class="output">
+
+<div class="whoami-card">
+
+<div class="whoami-top">
+
+<div class="avatar">
+TH
+</div>
+
+<div>
+<div class="name">
+Thio
+</div>
+
+<div class="role">
+Tech Hobbyist · Automation Enthusiast
+</div>
+</div>
+
+</div>
+
+<div class="whoami-body">
+
+<div class="row">
+<div class="key">specialty</div>
+<div>Self-hosted tools & automation</div>
+</div>
+
+<div class="row">
+<div class="key">focus</div>
+<div>Python · Local AI · Experimentation</div>
+</div>
+
+<div class="row">
+<div class="key">stack</div>
+<div>Python · Ollama · OpenClaw</div>
+</div>
+
+<div class="row">
+<div class="key">location</div>
+<div>Chiang Mai, Thailand</div>
+</div>
+
+<div class="row">
+<div class="key">github</div>
+<div class="cyan-text">
+github.com/ath1t
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+`;
+},
+
+experience(){
+
+let html = `
+<div class="output">
+
+<table class="table">
+
+<thead>
+<tr>
+<th>#</th>
+<th>role</th>
+<th>company</th>
+<th>period</th>
+</tr>
+</thead>
+
+<tbody>
+`;
+
+jobs.forEach((job,i)=>{
+
+html += `
+<tr onclick="showDetail(${i})">
+
+<td>${i+1}</td>
+
+<td class="role-cell">
+${job.role}
+</td>
+
+<td class="company">
+${job.company}
+</td>
+
+<td class="period">
+${job.period}
+</td>
+
+</tr>
+`;
+
+});
+
+html += `
+</tbody>
+</table>
+
+<div class="detail-panel" id="detailPanel"></div>
+
+</div>
+`;
+
+return html;
+
+},
+
+skills(){
+
+return `
+<div class="output">
+
+<div class="skills">
+
+<div class="skill">Python</div>
+<div class="skill">Automation</div>
+<div class="skill">Ollama</div>
+<div class="skill">OpenClaw</div>
+<div class="skill">Telegram Bots</div>
+<div class="skill">Local AI</div>
+<div class="skill">Workflow Systems</div>
+<div class="skill">Premiere Pro</div>
+<div class="skill">HandBrake</div>
+<div class="skill">StaxRip</div>
+<div class="skill">Self-hosting</div>
+<div class="skill">Experimentation</div>
+
+</div>
+
+</div>
+`;
+
+},
+
+projects(){
+
+return `
+<div class="output">
+
+selected projects:<br><br>
+
+1. Telegram Automation Platform<br>
+2. Local Deployment Environment<br>
+3. Workflow Automation Utilities<br>
+4. Media Processing Pipeline<br>
+5. Tea Time Infrastructure System<br>
+
+<br>
+
+run <span style="color:var(--cyan)">github</span>
+to view repositories
+
+</div>
+`;
+
+},
+
+github(){
+
+window.open(
+'https://github.com/ath1t',
+'_blank'
+);
+
+return `
+<div class="output">
+opening repositories...
+</div>
+`;
+
+},
+
+contact(){
+
+return `
+<div class="output">
+
+GitHub:<br><br>
+
+<a
+href="https://github.com/ath1t"
+target="_blank"
+style="color:var(--blue); text-decoration:none;"
+>
+github.com/ath1t
+</a>
+
+<br><br>
+
+<button
+onclick="copyMail()"
+style="
+background:rgba(63,185,80,.08);
+border:1px solid var(--green);
+color:var(--green);
+padding:8px 12px;
+border-radius:6px;
+cursor:pointer;
+font-family:inherit;
+"
+>
+copy email
+</button>
+
+</div>
+`;
+
+},
+
+clear(){
+
+linesEl.innerHTML = '';
+
+return '';
+
+}
+
+};
+
+input.addEventListener('keydown',(e)=>{
+
+if(e.key === 'Enter'){
+
+const value = input.value.trim().toLowerCase();
+
+if(value === '') return;
+
+append(promptLine(value));
+
+if(commands[value]){
+
+const result = commands[value]();
+
+if(result){
+append(result);
+}
+
+}else{
+
+append(`
+<div class="output" style="color:var(--red)">
+command not found: ${value}
+</div>
+`);
+
+}
+
+historyStack.unshift(value);
+
+historyIndex = -1;
+
+input.value = '';
+
+scrollBottom();
+
+}
+
+else if(e.key === 'ArrowUp'){
+
+if(historyStack.length === 0) return;
+
+historyIndex++;
+
+if(historyIndex >= historyStack.length){
+historyIndex = historyStack.length - 1;
+}
+
+input.value = historyStack[historyIndex];
+
+}
+
+else if(e.key === 'ArrowDown'){
+
+historyIndex--;
+
+if(historyIndex < 0){
+
+historyIndex = -1;
+
+input.value = '';
+
+return;
+
+}
+
+input.value = historyStack[historyIndex];
+
+}
+
+});
+
+document.querySelector('.terminal')
+.addEventListener('click',()=>{
+input.focus();
+});
+
+setTimeout(()=>{
+
+append(promptLine('help'));
+
+append(commands.help());
+
+},1000);
+
+</script>
+
+</body>
+</html>
