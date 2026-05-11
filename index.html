@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Thio — Tech Hobbyist</title>
+<title>Thio — Programming Hobbyist</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600;700&family=Anybody:wght@800&display=swap" rel="stylesheet">
 
@@ -32,6 +34,10 @@
   box-sizing:border-box;
 }
 
+html{
+  scroll-behavior:smooth;
+}
+
 body{
   background:var(--bg);
   color:var(--text);
@@ -44,7 +50,7 @@ body{
   align-items:center;
   justify-content:center;
 
-  overflow:hidden;
+  overflow:auto;
 
   padding:24px;
 }
@@ -166,6 +172,15 @@ body::before{
   padding:28px;
 }
 
+.term-body::-webkit-scrollbar{
+  width:8px;
+}
+
+.term-body::-webkit-scrollbar-thumb{
+  background:var(--dim);
+  border-radius:20px;
+}
+
 .boot-line{
   font-size:.72rem;
 
@@ -216,6 +231,8 @@ body::before{
   margin-bottom:24px;
 
   line-height:1.8;
+
+  font-size:.88rem;
 }
 
 .whoami-card{
@@ -225,7 +242,7 @@ body::before{
 
   overflow:hidden;
 
-  max-width:620px;
+  max-width:680px;
 }
 
 .whoami-top{
@@ -239,8 +256,8 @@ body::before{
 }
 
 .avatar{
-  width:48px;
-  height:48px;
+  width:52px;
+  height:52px;
 
   border-radius:10px;
 
@@ -259,7 +276,7 @@ body::before{
 .name{
   font-family:'Anybody', sans-serif;
 
-  font-size:1.3rem;
+  font-size:1.4rem;
 
   color:white;
 }
@@ -271,27 +288,25 @@ body::before{
 }
 
 .whoami-body{
-  padding:16px;
+  padding:18px;
 }
 
 .row{
   display:flex;
 
-  gap:16px;
+  gap:18px;
 
-  margin-bottom:10px;
+  margin-bottom:12px;
 
-  font-size:.8rem;
+  font-size:.82rem;
 }
 
 .key{
-  width:90px;
+  width:110px;
 
   color:var(--muted);
-}
 
-.green-text{
-  color:var(--green);
+  flex-shrink:0;
 }
 
 .cyan-text{
@@ -457,6 +472,19 @@ body::before{
   }
 }
 
+a{
+  color:var(--blue);
+  text-decoration:none;
+}
+
+button{
+  transition:.2s;
+}
+
+button:hover{
+  opacity:.85;
+}
+
 @media(max-width:700px){
 
   .term-body{
@@ -468,9 +496,15 @@ body::before{
     display:none;
   }
 
+  .row{
+    flex-direction:column;
+    gap:2px;
+  }
+
 }
 
 </style>
+
 </head>
 
 <body>
@@ -492,19 +526,17 @@ body::before{
 </div>
 
 <div class="title-right">
-thio.dev
+thio.sys
 </div>
 
 </div>
 
 <div class="term-body" id="termBody">
 
-<div class="boot-line">
-Last login: Fri May 8 14:32:11 2026
-</div>
+<div class="boot-line" id="lastLogin"></div>
 
 <div class="boot-line">
-thio runtime environment ·
+local runtime environment ·
 <span style="color:var(--green)">active</span>
 </div>
 
@@ -536,7 +568,9 @@ autofocus
 </div>
 
 </div>
+
 </div>
+
 </div>
 
 <div class="toast" id="toast">
@@ -545,55 +579,63 @@ autofocus
 
 <script>
 
+document.getElementById('lastLogin').innerText =
+`Last login: ${new Date().toLocaleString()}`;
+
 const linesEl = document.getElementById('lines');
 const input = document.getElementById('terminalInput');
 const body = document.getElementById('termBody');
 
 const jobs = [
+
 {
-role:'Independent Builder',
-company:'Personal Projects',
-period:'2025–Present',
-desc:'Experimenting with local AI systems, chatbot workflows, automation tools, and self-hosted environments.'
+role:'Programming Hobbyist',
+company:'Independent Projects',
+period:'2024–Present',
+desc:'Building local AI environments using Ollama and OpenClaw, including Telegram chatbot systems, workflow automation, and self-hosted tooling.'
 },
+
 {
 role:'Automation Hobbyist',
-company:'Independent',
-period:'2023–Present',
-desc:'Building small workflow tools, Python utilities, and productivity-focused automation systems.'
+company:'Personal Infrastructure',
+period:'2022–Present',
+desc:'Developing Python-based workflow systems, utilities, API integrations, and productivity-focused automation tools.'
 },
+
 {
 role:'Media Processing Enthusiast',
-company:'Personal Workflows',
+company:'Independent Workflow Systems',
 period:'2021–Present',
-desc:'Optimizing video encoding, transcoding, and media processing pipelines using professional tools.'
+desc:'Designing optimized media processing pipelines using FFmpeg, HandBrake, StaxRip, and GPU-accelerated workflows.'
 },
+
 {
 role:'Tea Time Project',
 company:'Future Business',
 period:'2026',
-desc:'Planning systems, branding, and digital workflows for a modern tea shop concept.'
+desc:'Planning branding, workflow systems, and digital infrastructure for a modern tea shop concept.'
 }
+
 ];
 
 const historyStack = [];
 let historyIndex = -1;
 
 function scrollBottom(){
-body.scrollTop = body.scrollHeight;
+  body.scrollTop = body.scrollHeight;
 }
 
 function append(html){
 
-const div = document.createElement('div');
+  const div = document.createElement('div');
 
-div.className = 'fade-up';
+  div.className = 'fade-up';
 
-div.innerHTML = html;
+  div.innerHTML = html;
 
-linesEl.appendChild(div);
+  linesEl.appendChild(div);
 
-scrollBottom();
+  scrollBottom();
 }
 
 function promptLine(cmd){
@@ -655,9 +697,10 @@ help(){
 return `
 <div class="output">
 
-available commands:<br>
+available commands:<br><br>
 
 ├── whoami<br>
+├── about<br>
 ├── experience<br>
 ├── skills<br>
 ├── projects<br>
@@ -685,13 +728,15 @@ TH
 </div>
 
 <div>
+
 <div class="name">
 Thio
 </div>
 
 <div class="role">
-Tech Hobbyist · Automation Enthusiast
+Programming Hobbyist · AI & Automation
 </div>
+
 </div>
 
 </div>
@@ -699,23 +744,47 @@ Tech Hobbyist · Automation Enthusiast
 <div class="whoami-body">
 
 <div class="row">
-<div class="key">specialty</div>
-<div>Self-hosted tools & automation</div>
+<div class="key">about</div>
+<div>
+Programming hobbyist focused on local AI systems,
+automation workflows, and self-hosted tooling.
+</div>
+</div>
+
+<div class="row">
+<div class="key">experience</div>
+<div>
+6+ years building automation tools, AI workflows,
+and performance-focused systems.
+</div>
 </div>
 
 <div class="row">
 <div class="key">focus</div>
-<div>Python · Local AI · Experimentation</div>
+<div>
+Python · Local AI · Workflow Automation
+</div>
 </div>
 
 <div class="row">
 <div class="key">stack</div>
-<div>Python · Ollama · OpenClaw</div>
+<div>
+Python · Ollama · OpenClaw · Telegram API
+</div>
+</div>
+
+<div class="row">
+<div class="key">specialty</div>
+<div>
+Local inference environments & workflow systems
+</div>
 </div>
 
 <div class="row">
 <div class="key">location</div>
-<div>Chiang Mai, Thailand</div>
+<div>
+Chiang Mai, Thailand
+</div>
 </div>
 
 <div class="row">
@@ -726,10 +795,30 @@ github.com/ath1t
 </div>
 
 </div>
+
 </div>
 
 </div>
 `;
+},
+
+about(){
+
+return `
+<div class="output">
+
+Programming hobbyist focused on local AI systems,
+automation workflows, and self-hosted tooling.
+
+<br>
+
+Mostly building things with Python, Ollama,
+OpenClaw, and random late-night ideas that
+somehow turn into real systems.
+
+</div>
+`;
+
 },
 
 experience(){
@@ -802,11 +891,13 @@ return `
 <div class="skill">Telegram Bots</div>
 <div class="skill">Local AI</div>
 <div class="skill">Workflow Systems</div>
+<div class="skill">Self-hosting</div>
+<div class="skill">API Integration</div>
+<div class="skill">FFmpeg</div>
 <div class="skill">Premiere Pro</div>
 <div class="skill">HandBrake</div>
 <div class="skill">StaxRip</div>
-<div class="skill">Self-hosting</div>
-<div class="skill">Experimentation</div>
+<div class="skill">GPU Workflows</div>
 
 </div>
 
@@ -820,13 +911,14 @@ projects(){
 return `
 <div class="output">
 
-selected projects:<br><br>
+selected systems & projects:<br><br>
 
-1. Telegram Automation Platform<br>
-2. Local Deployment Environment<br>
-3. Workflow Automation Utilities<br>
-4. Media Processing Pipeline<br>
-5. Tea Time Infrastructure System<br>
+1. OpenClaw Telegram AI Assistant<br>
+2. Local LLM Deployment Environment<br>
+3. AI Workflow Automation Utilities<br>
+4. GPU-Optimized Media Pipeline<br>
+5. Self-Hosted Productivity Systems<br>
+6. Tea Time Digital Infrastructure<br>
 
 <br>
 
@@ -863,7 +955,6 @@ GitHub:<br><br>
 <a
 href="https://github.com/ath1t"
 target="_blank"
-style="color:var(--blue); text-decoration:none;"
 >
 github.com/ath1t
 </a>
@@ -904,15 +995,16 @@ input.addEventListener('keydown',(e)=>{
 
 if(e.key === 'Enter'){
 
-const value = input.value.trim().toLowerCase();
+const value = input.value.trim();
+const command = value.toLowerCase();
 
 if(value === '') return;
 
 append(promptLine(value));
 
-if(commands[value]){
+if(commands[command]){
 
-const result = commands[value]();
+const result = commands[command]();
 
 if(result){
 append(result);
@@ -988,4 +1080,5 @@ append(commands.help());
 </script>
 
 </body>
+
 </html>
